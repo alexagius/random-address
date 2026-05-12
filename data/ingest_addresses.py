@@ -129,6 +129,7 @@ def normalize_record(
     state: str,
     city_fallback: Optional[str] = None,
     require_postal_code: bool = True,
+    require_city: bool = True,
 ) -> Optional[Address]:
     properties = record.get("properties") or {}
     number = clean_value(first_present(properties, ("NUMBER", "number", "addr:housenumber")))
@@ -140,7 +141,12 @@ def normalize_record(
     )
     coordinates = record.get("coordinates")
 
-    if not street or (require_postal_code and not postcode) or not coordinates:
+    if (
+        not street
+        or (require_city and not city)
+        or (require_postal_code and not postcode)
+        or not coordinates
+    ):
         return None
 
     address1 = f"{number} {street}".strip() if number else street

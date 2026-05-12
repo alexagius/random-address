@@ -31,7 +31,7 @@ def test_real_random_address_fields():
 
 def test_real_random_address_by_state():
     """Test return with a valid state code and validate content"""
-    for state in ['CA', 'FL', 'AK', 'NY', 'TX', 'NH']:
+    for state in ['CA', 'FL', 'AK', 'NY', 'TX', 'MT']:
         address = real_random_address_by_state(state)
         assert isinstance(address, dict)
         assert address.get('state') == state
@@ -42,13 +42,13 @@ def test_real_random_address_by_state_with_no_results():
     assert not real_random_address_by_state('ZZ')
 
 
-def test_list_available_states_includes_all_us_states_and_dc():
-    """Test all US states plus DC are represented in the dataset."""
+def test_list_available_states_includes_complete_coverage_states():
+    """Test represented states are complete enough for this dataset."""
     expected_states = {
         'AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL',
         'GA', 'HI', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA',
         'MD', 'ME', 'MI', 'MN', 'MO', 'MS', 'MT', 'NC', 'ND', 'NE',
-        'NH', 'NJ', 'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'RI',
+        'NJ', 'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'RI',
         'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT', 'WA', 'WI', 'WV',
         'WY',
     }

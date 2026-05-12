@@ -58,7 +58,7 @@ def test_records_from_sample_normalizes_features():
     ]
 
 
-def test_records_from_sample_can_allow_missing_postal_code():
+def test_records_from_sample_skips_incomplete_features():
     sample = [
         {
             "type": "Feature",
@@ -75,11 +75,32 @@ def test_records_from_sample_can_allow_missing_postal_code():
         }
     ]
 
+    addresses = import_openaddresses_samples.records_from_sample(sample, "NH")
+
+    assert addresses == []
+
+
+def test_records_from_sample_uses_explicit_city_fallback():
+    sample = [
+        {
+            "type": "Feature",
+            "properties": {
+                "number": "2034",
+                "street": "Hauser Boulevard",
+                "city": "",
+                "postcode": "59601",
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [-112.027, 46.589],
+            },
+        }
+    ]
+
     addresses = import_openaddresses_samples.records_from_sample(
         sample,
-        "NH",
-        allow_missing_postal=True,
+        "MT",
+        city_fallback="Helena",
     )
 
-    assert addresses[0]["state"] == "NH"
-    assert addresses[0]["postalCode"] == ""
+    assert addresses[0]["city"] == "Helena"

@@ -39,9 +39,13 @@ python data\import_openaddresses_samples.py
 ```
 
 By default, it imports public samples from up to three OpenAddresses sources per
-state that is not already represented in the packaged dataset. Current
-OpenAddresses New Hampshire samples omit postcodes, so the importer allows
-blank `postalCode` values for `NH` by default.
+state that is not already represented in the packaged dataset. Records are only
+kept when they include `address1`, `city`, `state`, `postalCode`, and
+coordinates.
+
+See `DATASET_COVERAGE.md` for per-state existing, added, and total record
+counts. New Hampshire is currently not imported because the checked
+OpenAddresses NH sources omit postcodes.
 
 The ingestion script accepts OpenAddresses-style CSV files, GeoJSON
 FeatureCollections, and newline-delimited GeoJSON Features:

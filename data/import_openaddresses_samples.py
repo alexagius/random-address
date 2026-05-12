@@ -27,7 +27,9 @@ from ingest_addresses import (
 OPENADDRESSES_API = "https://batch.openaddresses.io/api"
 INCLUDED_US_CODES = VALID_STATES
 REQUEST_TIMEOUT_SECONDS = 30
-DEFAULT_ALLOW_MISSING_POSTAL_STATES = {"NH"}
+CITY_FALLBACKS = {
+    "us/mt/helena": "Helena",
+}
 
 
 def fetch_json(url: str) -> Any:
@@ -103,7 +105,7 @@ def choose_sources(rows: Sequence[Dict[str, Any]], limit: int) -> List[Dict[str,
 def records_from_sample(
     sample: Iterable[Dict[str, Any]],
     state: str,
-    allow_missing_postal: bool = False,
+    city_fallback: Optional[str] = None,
 ) -> List[Address]:
     addresses = []
     for feature in sample:
@@ -118,7 +120,7 @@ def records_from_sample(
         address = normalize_record(
             record,
             state=state,
-            require_postal_code=not allow_missing_postal,
+            city_fallback=city_fallback,
         )
         if address is not None:
             addresses.append(address)
@@ -156,7 +158,7 @@ def import_samples(args: argparse.Namespace) -> Dict[str, Any]:
             addresses = records_from_sample(
                 sample,
                 state,
-                allow_missing_postal=state in args.allow_missing_postal_states,
+                city_fallback=CITY_FALLBACKS.get(source["source"]),
             )
             if not addresses:
                 print(f"{state}: {source['source']} job={source['job']} skipped empty sample")
@@ -203,16 +205,6 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
         type=int,
         default=3,
         help="Maximum OpenAddresses sources to sample for each state.",
-    )
-    parser.add_argument(
-        "--allow-missing-postal-states",
-        nargs="+",
-        choices=sorted(VALID_STATES),
-        default=sorted(DEFAULT_ALLOW_MISSING_POSTAL_STATES),
-        help=(
-            "State codes allowed to import sampled addresses with blank postalCode. "
-            "Defaults to NH because current OpenAddresses NH sources omit postcodes."
-        ),
     )
     parser.add_argument(
         "--base",
