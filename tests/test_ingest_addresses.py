@@ -167,3 +167,24 @@ def test_per_postal_code_sampling_is_reproducible():
 
     assert first == second
     assert len(first) == 3
+
+
+def test_normalize_record_can_allow_missing_postal_code():
+    record = {
+        "properties": {
+            "number": "615",
+            "street": "Amherst Street",
+            "city": "Nashua",
+            "postcode": "",
+        },
+        "coordinates": (-71.4676, 42.7654),
+    }
+
+    address = ingest_addresses.normalize_record(
+        record,
+        state="NH",
+        require_postal_code=False,
+    )
+
+    assert address["state"] == "NH"
+    assert address["postalCode"] == ""

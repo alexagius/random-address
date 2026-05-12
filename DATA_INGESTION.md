@@ -31,6 +31,18 @@ import random_address
 Put raw source files under `data/sources/`. That directory is intentionally
 ignored by git, so large downloaded inputs do not end up in the package.
 
+For a small first pass that gives missing states coverage from current
+OpenAddresses data, use the sample importer:
+
+```powershell
+python data\import_openaddresses_samples.py
+```
+
+By default, it imports public samples from up to three OpenAddresses sources per
+state that is not already represented in the packaged dataset. Current
+OpenAddresses New Hampshire samples omit postcodes, so the importer allows
+blank `postalCode` values for `NH` by default.
+
 The ingestion script accepts OpenAddresses-style CSV files, GeoJSON
 FeatureCollections, and newline-delimited GeoJSON Features:
 
