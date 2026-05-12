@@ -150,6 +150,10 @@ Thumbs.db
 # profiling data
 .prof
 
+# Local source files used to rebuild the packaged address dataset
+data/sources/
+data/work/
+
 # IDE
 .idea/
 
