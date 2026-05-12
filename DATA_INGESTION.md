@@ -5,6 +5,15 @@ address dataset.
 
 ## Use This Fork In Another Project
 
+For active local development from a consuming project's virtual environment:
+
+```powershell
+python -m pip install -e ..\random-address
+```
+
+Adjust `..\random-address` to the relative path from that project to this
+checkout.
+
 For a GitHub-pinned install:
 
 ```powershell
@@ -50,6 +59,9 @@ After a successful merge, run tests:
 ```powershell
 python -m pytest
 ```
+
+If you use a project-local virtual environment, keep it in `.venv/`; that path
+is ignored by git.
 
 Then commit and push:
 
