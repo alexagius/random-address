@@ -64,10 +64,10 @@ These functions allow you to inspect the dataset contents:
 
 >>> random_address.get_summary()
 {
-    'total_addresses': 252721,
-    'unique_states': 50,
-    'unique_cities': 18100,
-    'unique_postal_codes': 26282
+    'total_addresses': 254927,
+    'unique_states': 51,
+    'unique_cities': 18170,
+    'unique_postal_codes': 26506
 }
 ```
 
@@ -198,7 +198,7 @@ Data is collected from the [OpenAddresses](https://openaddresses.io/) project an
 
 If you need deeper coverage for a specific **city**, **state**, or **postal code**, please open a new [GitHub Issue](https://github.com/neosergio/random-address/issues) describing your request.
 
-The dataset now includes 49 US states plus DC and more than 26,000 ZIP codes. New Hampshire is not included because the checked complete-record sources do not provide usable ZIP-coded address points for this branch, and incomplete records are not added.
+The dataset now includes all 50 US states plus DC and more than 26,000 ZIP codes. Incomplete records are not added.
 
 Requests will be evaluated and added **gradually**, in order to:
 

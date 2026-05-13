@@ -3,68 +3,66 @@
 Counts are generated from `random_address/addresses-us-all.min.json` on this branch.
 Records are kept only when they include `address1`, `city`, `state`, a 5-digit `postalCode`, and coordinates.
 
-- Total addresses: 252,721
-- Unique state/DC codes represented: 50
-- Unique ZIP codes represented: 26,282
-- ZIP codes with at least 10 addresses: 24,063
-- ZIP codes with at least 5 addresses: 24,496
+- Total addresses: 254,927
+- Unique state/DC codes represented: 51
+- Unique ZIP codes represented: 26,506
+- ZIP codes with at least 10 addresses: 24,277
+- ZIP codes with at least 5 addresses: 24,720
 - ZIP codes with 1-4 addresses: 1,786
 - Records with `address2`: 18,384
 
 | State | Name | Main Branch | Added In This PR | Total | Notes |
 | --- | --- | ---: | ---: | ---: | --- |
-| AL | Alabama | 3015 | 2256 | 5271 | Expanded by Overture 10-per-ZIP sampling |
-| AK | Alaska | 436 | 251 | 687 | Expanded by Overture 10-per-ZIP sampling |
-| AZ | Arizona | 2007 | 1762 | 3769 | Expanded by Overture 10-per-ZIP sampling |
-| AR | Arkansas | 3333 | 2956 | 6289 | Expanded by Overture 10-per-ZIP sampling |
-| CA | California | 8484 | 7748 | 16232 | Expanded by Overture 10-per-ZIP sampling |
-| CO | Colorado | 2142 | 1847 | 3989 | Expanded by Overture 10-per-ZIP sampling |
-| CT | Connecticut | 1589 | 1390 | 2979 | Expanded by Overture 10-per-ZIP sampling |
-| DE | Delaware | 407 | 329 | 736 | Expanded by Overture 10-per-ZIP sampling |
-| DC | District of Columbia | 496 | 160 | 656 | Expanded by Overture 10-per-ZIP sampling |
-| FL | Florida | 4888 | 4601 | 9489 | Expanded by Overture 10-per-ZIP sampling |
-| GA | Georgia | 577 | 321 | 898 | Expanded by Overture 10-per-ZIP sampling |
+| AL | Alabama | 5271 | 0 | 5271 | Unchanged from main |
+| AK | Alaska | 687 | 0 | 687 | Unchanged from main |
+| AZ | Arizona | 3769 | 0 | 3769 | Unchanged from main |
+| AR | Arkansas | 6289 | 0 | 6289 | Unchanged from main |
+| CA | California | 16232 | 0 | 16232 | Unchanged from main |
+| CO | Colorado | 3989 | 0 | 3989 | Unchanged from main |
+| CT | Connecticut | 2979 | 0 | 2979 | Unchanged from main |
+| DE | Delaware | 736 | 0 | 736 | Unchanged from main |
+| DC | District of Columbia | 656 | 0 | 656 | Unchanged from main |
+| FL | Florida | 9489 | 0 | 9489 | Unchanged from main |
+| GA | Georgia | 898 | 0 | 898 | Unchanged from main |
 | HI | Hawaii | 42 | 0 | 42 | Unchanged from main |
-| ID | Idaho | 475 | 391 | 866 | Expanded by Overture 10-per-ZIP sampling |
-| IL | Illinois | 6937 | 6748 | 13685 | Expanded by Overture 10-per-ZIP sampling |
-| IN | Indiana | 3952 | 3870 | 7822 | Expanded by Overture 10-per-ZIP sampling |
-| IA | Iowa | 4696 | 4146 | 8842 | Expanded by Overture 10-per-ZIP sampling |
-| KS | Kansas | 3007 | 2912 | 5919 | Expanded by Overture 10-per-ZIP sampling |
-| KY | Kentucky | 3808 | 3352 | 7160 | Expanded by Overture 10-per-ZIP sampling |
-| LA | Louisiana | 266 | 200 | 466 | Expanded by Overture 10-per-ZIP sampling |
-| ME | Maine | 2156 | 2089 | 4245 | Expanded by Overture 10-per-ZIP sampling |
-| MD | Maryland | 2414 | 2190 | 4604 | Expanded by Overture 10-per-ZIP sampling |
-| MA | Massachusetts | 2820 | 2627 | 5447 | Expanded by Overture 10-per-ZIP sampling |
-| MI | Michigan | 900 | 739 | 1639 | Expanded by Overture 10-per-ZIP sampling |
-| MN | Minnesota | 4206 | 4016 | 8222 | Expanded by Overture 10-per-ZIP sampling |
-| MS | Mississippi | 1733 | 1622 | 3355 | Expanded by Overture 10-per-ZIP sampling |
-| MO | Missouri | 2002 | 1826 | 3828 | Expanded by Overture 10-per-ZIP sampling |
-| MT | Montana | 1858 | 1831 | 3689 | Expanded by Overture 10-per-ZIP sampling |
-| NE | Nebraska | 780 | 677 | 1457 | Expanded by Overture 10-per-ZIP sampling |
+| ID | Idaho | 866 | 0 | 866 | Unchanged from main |
+| IL | Illinois | 13685 | 0 | 13685 | Unchanged from main |
+| IN | Indiana | 7822 | 0 | 7822 | Unchanged from main |
+| IA | Iowa | 8842 | 0 | 8842 | Unchanged from main |
+| KS | Kansas | 5919 | 0 | 5919 | Unchanged from main |
+| KY | Kentucky | 7160 | 0 | 7160 | Unchanged from main |
+| LA | Louisiana | 466 | 0 | 466 | Unchanged from main |
+| ME | Maine | 4245 | 0 | 4245 | Unchanged from main |
+| MD | Maryland | 4604 | 0 | 4604 | Unchanged from main |
+| MA | Massachusetts | 5447 | 0 | 5447 | Unchanged from main |
+| MI | Michigan | 1639 | 0 | 1639 | Unchanged from main |
+| MN | Minnesota | 8222 | 0 | 8222 | Unchanged from main |
+| MS | Mississippi | 3355 | 0 | 3355 | Unchanged from main |
+| MO | Missouri | 3828 | 0 | 3828 | Unchanged from main |
+| MT | Montana | 3689 | 0 | 3689 | Unchanged from main |
+| NE | Nebraska | 1457 | 0 | 1457 | Unchanged from main |
 | NV | Nevada | 63 | 0 | 63 | Unchanged from main |
-| NH | New Hampshire | 0 | 0 | 0 | Not represented by the current complete-record sources |
-| NJ | New Jersey | 3013 | 2913 | 5926 | Expanded by Overture 10-per-ZIP sampling |
-| NM | New Mexico | 1692 | 1539 | 3231 | Expanded by Overture 10-per-ZIP sampling |
-| NY | New York | 8650 | 8428 | 17078 | Expanded by Overture 10-per-ZIP sampling |
-| NC | North Carolina | 3962 | 3848 | 7810 | Expanded by Overture 10-per-ZIP sampling |
-| ND | North Dakota | 2018 | 1945 | 3963 | Expanded by Overture 10-per-ZIP sampling |
-| OH | Ohio | 6022 | 5885 | 11907 | Expanded by Overture 10-per-ZIP sampling |
-| OK | Oklahoma | 3101 | 2703 | 5804 | Expanded by Overture 10-per-ZIP sampling |
-| OR | Oregon | 2973 | 1342 | 4315 | Expanded by Overture 10-per-ZIP sampling |
-| PA | Pennsylvania | 1606 | 1447 | 3053 | Expanded by Overture 10-per-ZIP sampling |
-| RI | Rhode Island | 145 | 122 | 267 | Expanded by Overture 10-per-ZIP sampling |
-| SC | South Carolina | 218 | 120 | 338 | Expanded by Overture 10-per-ZIP sampling |
-| SD | South Dakota | 188 | 110 | 298 | Expanded by Overture 10-per-ZIP sampling |
-| TN | Tennessee | 3825 | 3120 | 6945 | Expanded by Overture 10-per-ZIP sampling |
-| TX | Texas | 8119 | 7605 | 15724 | Expanded by Overture 10-per-ZIP sampling |
-| UT | Utah | 1568 | 1495 | 3063 | Expanded by Overture 10-per-ZIP sampling |
-| VT | Vermont | 1464 | 1294 | 2758 | Expanded by Overture 10-per-ZIP sampling |
-| VA | Virginia | 4462 | 4378 | 8840 | Expanded by Overture 10-per-ZIP sampling |
-| WA | Washington | 2834 | 2462 | 5296 | Expanded by Overture 10-per-ZIP sampling |
-| WV | West Virginia | 3698 | 3571 | 7269 | Expanded by Overture 10-per-ZIP sampling |
-| WI | Wisconsin | 2988 | 2843 | 5831 | Expanded by Overture 10-per-ZIP sampling |
-| WY | Wyoming | 391 | 268 | 659 | Expanded by Overture 10-per-ZIP sampling |
+| NH | New Hampshire | 0 | 2206 | 2206 | Added from NH GRANIT parcel points and geocoder |
+| NJ | New Jersey | 5926 | 0 | 5926 | Unchanged from main |
+| NM | New Mexico | 3231 | 0 | 3231 | Unchanged from main |
+| NY | New York | 17078 | 0 | 17078 | Unchanged from main |
+| NC | North Carolina | 7810 | 0 | 7810 | Unchanged from main |
+| ND | North Dakota | 3963 | 0 | 3963 | Unchanged from main |
+| OH | Ohio | 11907 | 0 | 11907 | Unchanged from main |
+| OK | Oklahoma | 5804 | 0 | 5804 | Unchanged from main |
+| OR | Oregon | 4315 | 0 | 4315 | Unchanged from main |
+| PA | Pennsylvania | 3053 | 0 | 3053 | Unchanged from main |
+| RI | Rhode Island | 267 | 0 | 267 | Unchanged from main |
+| SC | South Carolina | 338 | 0 | 338 | Unchanged from main |
+| SD | South Dakota | 298 | 0 | 298 | Unchanged from main |
+| TN | Tennessee | 6945 | 0 | 6945 | Unchanged from main |
+| TX | Texas | 15724 | 0 | 15724 | Unchanged from main |
+| UT | Utah | 3063 | 0 | 3063 | Unchanged from main |
+| VT | Vermont | 2758 | 0 | 2758 | Unchanged from main |
+| VA | Virginia | 8840 | 0 | 8840 | Unchanged from main |
+| WA | Washington | 5296 | 0 | 5296 | Unchanged from main |
+| WV | West Virginia | 7269 | 0 | 7269 | Unchanged from main |
+| WI | Wisconsin | 5831 | 0 | 5831 | Unchanged from main |
+| WY | Wyoming | 659 | 0 | 659 | Unchanged from main |
 
-| **Total** |  | **132426** | **120295** | **252721** |  |
-
-New Hampshire remains omitted because the checked complete-record sources did not provide usable ZIP-coded address points for this branch.
+| **Total** |  | **252721** | **2206** | **254927** |  |
