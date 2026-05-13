@@ -1,8 +1,8 @@
 # Random Address
 
-This is a tool to retrieve a real address from a list of real of random addresses that geocode successfully (tested on Google's Geocoding API service). The address data comes from the OpenAddresses project, and all the addresses are in the public domain. The addresses are deliberately not linked to people or businesses; the only guarantee is that they are real addresses that geocode successfully.
+This is a tool to retrieve a real address from a list of real of random addresses that geocode successfully (tested on Google's Geocoding API service). The address data comes from open address datasets including OpenAddresses and Overture Maps. The addresses are deliberately not linked to people or businesses; the only guarantee is that they are real addresses from open address datasets.
 
-The addresses were pulled from OpenAddress where the "Required attribute" field was present and not "Yes". See "Attribution" below for a list of sources (also included in each data file).
+The original addresses were pulled from OpenAddress where the "Required attribute" field was present and not "Yes". Newer records are imported only when they include address line 1, city, state, ZIP code, and coordinates. See "Attribution" below for a list of sources (also included in each data file).
 
 This project was inspired by [Real, Random Address Data (RRAD)](https://github.com/EthanRBrown/rrad) project.
 
@@ -45,7 +45,7 @@ There are other 3 functions that can be used:
 These functions allow you to inspect the dataset contents:
 ```python
 >>> random_address.list_available_states()
-['AK', 'CA', 'FL', 'VA', ...]
+['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL', ...]
 
 >>> random_address.list_available_postal_codes()
 ['32409', '93546', '94560', '99577', ...]
@@ -64,10 +64,10 @@ These functions allow you to inspect the dataset contents:
 
 >>> random_address.get_summary()
 {
-    'total_addresses': 43873,
-    'unique_states': 47,
-    'unique_cities': 1300,
-    'unique_postal_codes': 950
+    'total_addresses': 132426,
+    'unique_states': 50,
+    'unique_cities': 17476,
+    'unique_postal_codes': 26282
 }
 ```
 
@@ -86,7 +86,7 @@ These functions allow you to inspect the dataset contents:
 
 ## Attribution
 
-All data collected from the [OpenAddresses](https://openaddresses.io/) project, and is in the public domain.  Original sources:
+Data is collected from the [OpenAddresses](https://openaddresses.io/) project and [Overture Maps](https://overturemaps.org/). The full generated attribution list is included in `random_address/addresses-us-all.min.json`. Original sources include:
 
 * City of Haddam (CT)
 * Ciy of Hartford (CT)
@@ -196,7 +196,9 @@ All data collected from the [OpenAddresses](https://openaddresses.io/) project, 
 
 ## Requesting New Location Data
 
-If you need addresses for a specific **city**, **state**, or **postal code** that is not yet included in the dataset, please open a new [GitHub Issue](https://github.com/neosergio/random-address/issues) describing your request.
+If you need deeper coverage for a specific **city**, **state**, or **postal code**, please open a new [GitHub Issue](https://github.com/neosergio/random-address/issues) describing your request.
+
+The dataset now includes 49 US states plus DC and more than 26,000 ZIP codes. New Hampshire is not included because the checked complete-record sources do not provide usable ZIP-coded address points for this branch, and incomplete records are not added.
 
 Requests will be evaluated and added **gradually**, in order to:
 

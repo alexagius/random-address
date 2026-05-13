@@ -4,6 +4,7 @@ Tests for random_address module
 from random_address import real_random_address
 from random_address import real_random_address_by_state
 from random_address import real_random_address_by_postal_code
+from random_address import list_available_states
 
 
 def test_real_random_address():
@@ -30,7 +31,7 @@ def test_real_random_address_fields():
 
 def test_real_random_address_by_state():
     """Test return with a valid state code and validate content"""
-    for state in ['CA', 'FL', 'AK']:
+    for state in ['CA', 'FL', 'AK', 'NY', 'TX', 'MT']:
         address = real_random_address_by_state(state)
         assert isinstance(address, dict)
         assert address.get('state') == state
@@ -38,7 +39,20 @@ def test_real_random_address_by_state():
 
 def test_real_random_address_by_state_with_no_results():
     """Test return with a state code with no results"""
-    assert not real_random_address_by_state('NY')
+    assert not real_random_address_by_state('ZZ')
+
+
+def test_list_available_states_includes_complete_coverage_states():
+    """Test represented states are complete enough for this dataset."""
+    expected_states = {
+        'AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DC', 'DE', 'FL',
+        'GA', 'HI', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA',
+        'MD', 'ME', 'MI', 'MN', 'MO', 'MS', 'MT', 'NC', 'ND', 'NE',
+        'NJ', 'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'RI',
+        'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT', 'WA', 'WI', 'WV',
+        'WY',
+    }
+    assert set(list_available_states()) == expected_states
 
 
 def test_real_random_address_by_postal_code():
@@ -52,4 +66,4 @@ def test_real_random_address_by_postal_code():
 
 def test_real_random_address_by_postal_code_with_no_results():
     """Test return with a postal code with no results"""
-    assert not real_random_address_by_postal_code('90210')
+    assert not real_random_address_by_postal_code('00000')
