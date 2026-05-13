@@ -44,8 +44,33 @@ kept when they include `address1`, `city`, `state`, `postalCode`, and
 coordinates.
 
 See `DATASET_COVERAGE.md` for per-state existing, added, and total record
-counts. New Hampshire is currently not imported because the checked
-OpenAddresses NH sources omit postcodes.
+counts.
+
+For broader ZIP coverage, use the Overture Maps importer. It requires DuckDB in
+the development virtual environment because it queries Overture's public
+GeoParquet files directly:
+
+```powershell
+python -m pip install duckdb
+python data\import_overture_samples.py --per-postal-code 5
+```
+
+This keeps up to five complete, geocoded addresses per state/ZIP pair when the
+source provides them. Use `--per-postal-code 10` for a larger local fork.
+
+The Netsyms address database can also be tested locally after downloading a
+SQLite file from their site:
+
+```powershell
+python data\import_sqlite_addresses.py `
+  --input data\sources\netsyms-addresses.sqlite `
+  --per-postal-code 5 `
+  --attribution "Netsyms Address Database"
+```
+
+Netsyms source files belong under `data/sources/`, which is ignored by git.
+Review the source terms before redistributing any records imported from that
+database.
 
 The ingestion script accepts OpenAddresses-style CSV files, GeoJSON
 FeatureCollections, and newline-delimited GeoJSON Features:

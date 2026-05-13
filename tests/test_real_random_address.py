@@ -66,4 +66,4 @@ def test_real_random_address_by_postal_code():
 
 def test_real_random_address_by_postal_code_with_no_results():
     """Test return with a postal code with no results"""
-    assert not real_random_address_by_postal_code('90210')
+    assert not real_random_address_by_postal_code('00000')

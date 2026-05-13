@@ -189,7 +189,15 @@ def clean_postal_code(value: Optional[Any]) -> str:
     if not cleaned:
         return ""
     if "-" in cleaned:
-        return cleaned.split("-", 1)[0]
+        cleaned = cleaned.split("-", 1)[0]
+    if cleaned.endswith(".0") and cleaned[:-2].isdigit():
+        cleaned = cleaned[:-2]
+    if len(cleaned) >= 5 and cleaned[:5].isdigit():
+        cleaned = cleaned[:5]
+    if cleaned in {"00000", "99999"}:
+        return ""
+    if len(cleaned) != 5 or not cleaned.isdigit():
+        return ""
     return cleaned
 
 

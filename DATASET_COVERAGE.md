@@ -1,60 +1,69 @@
 # Dataset Coverage
 
 Counts are generated from `random_address/addresses-us-all.min.json` on this branch.
-Newly imported records are kept only when they include `address1`, `city`, `state`, `postalCode`, and coordinates.
+Records are kept only when they include `address1`, `city`, `state`, a 5-digit `postalCode`, and coordinates.
 
-| State | Name | Existing | Added | Total | Notes |
+- Total addresses: 132,426
+- Unique state/DC codes represented: 50
+- Unique ZIP codes represented: 26,282
+- ZIP codes with at least 5 addresses: 24,459
+- ZIP codes with 1-4 addresses: 1,823
+- Records with `address2`: 9,720
+
+| State | Name | Original | Net Added | Total | Notes |
 | --- | --- | ---: | ---: | ---: | --- |
-| AL | Alabama | 193 | 0 | 193 | Existing dataset |
-| AK | Alaska | 174 | 0 | 174 | Existing dataset |
-| AZ | Arizona | 199 | 0 | 199 | Existing dataset |
-| AR | Arkansas | 190 | 0 | 190 | Existing dataset |
-| CA | California | 332 | 0 | 332 | Existing dataset |
-| CO | Colorado | 230 | 0 | 230 | Existing dataset |
-| CT | Connecticut | 196 | 0 | 196 | Existing dataset |
-| DE | Delaware | 0 | 63 | 63 | OpenAddresses sample import |
-| DC | District of Columbia | 196 | 0 | 196 | Existing dataset |
-| FL | Florida | 208 | 0 | 208 | Existing dataset |
-| GA | Georgia | 192 | 0 | 192 | Existing dataset |
-| HI | Hawaii | 0 | 42 | 42 | OpenAddresses sample import |
-| ID | Idaho | 0 | 53 | 53 | OpenAddresses sample import |
-| IL | Illinois | 0 | 58 | 58 | OpenAddresses sample import |
-| IN | Indiana | 0 | 42 | 42 | OpenAddresses sample import |
-| IA | Iowa | 0 | 40 | 40 | OpenAddresses sample import |
-| KS | Kansas | 0 | 55 | 55 | OpenAddresses sample import |
-| KY | Kentucky | 190 | 0 | 190 | Existing dataset |
-| LA | Louisiana | 0 | 63 | 63 | OpenAddresses sample import |
-| ME | Maine | 0 | 21 | 21 | OpenAddresses sample import |
-| MD | Maryland | 187 | 0 | 187 | Existing dataset |
-| MA | Massachusetts | 188 | 0 | 188 | Existing dataset |
-| MI | Michigan | 0 | 44 | 44 | OpenAddresses sample import |
-| MN | Minnesota | 0 | 61 | 61 | OpenAddresses sample import |
-| MS | Mississippi | 0 | 53 | 53 | OpenAddresses sample import |
-| MO | Missouri | 0 | 63 | 63 | OpenAddresses sample import |
-| MT | Montana | 0 | 21 | 21 | OpenAddresses sample import |
-| NE | Nebraska | 0 | 42 | 42 | OpenAddresses sample import |
-| NV | Nevada | 0 | 63 | 63 | OpenAddresses sample import |
-| NH | New Hampshire | 0 | 0 | 0 | Not added: current OpenAddresses sources omit postcodes |
-| NJ | New Jersey | 0 | 42 | 42 | OpenAddresses sample import |
-| NM | New Mexico | 0 | 63 | 63 | OpenAddresses sample import |
-| NY | New York | 0 | 63 | 63 | OpenAddresses sample import |
-| NC | North Carolina | 0 | 63 | 63 | OpenAddresses sample import |
-| ND | North Dakota | 0 | 61 | 61 | OpenAddresses sample import |
-| OH | Ohio | 0 | 63 | 63 | OpenAddresses sample import |
-| OK | Oklahoma | 175 | 0 | 175 | Existing dataset |
-| OR | Oregon | 0 | 58 | 58 | OpenAddresses sample import |
-| PA | Pennsylvania | 0 | 63 | 63 | OpenAddresses sample import |
-| RI | Rhode Island | 0 | 19 | 19 | OpenAddresses sample import |
-| SC | South Carolina | 0 | 63 | 63 | OpenAddresses sample import |
-| SD | South Dakota | 0 | 63 | 63 | OpenAddresses sample import |
-| TN | Tennessee | 195 | 0 | 195 | Existing dataset |
-| TX | Texas | 0 | 54 | 54 | OpenAddresses sample import |
-| UT | Utah | 0 | 63 | 63 | OpenAddresses sample import |
-| VT | Vermont | 175 | 0 | 175 | Existing dataset |
-| VA | Virginia | 50 | 0 | 50 | Existing dataset |
-| WA | Washington | 0 | 39 | 39 | OpenAddresses sample import |
-| WV | West Virginia | 0 | 62 | 62 | OpenAddresses sample import |
-| WI | Wisconsin | 0 | 63 | 63 | OpenAddresses sample import |
-| WY | Wyoming | 0 | 42 | 42 | OpenAddresses sample import |
+| AL | Alabama | 193 | 2822 | 3015 | Original plus OpenAddresses/Overture samples |
+| AK | Alaska | 174 | 262 | 436 | Original plus OpenAddresses/Overture samples |
+| AZ | Arizona | 199 | 1808 | 2007 | Original plus OpenAddresses/Overture samples |
+| AR | Arkansas | 190 | 3143 | 3333 | Original plus OpenAddresses/Overture samples |
+| CA | California | 332 | 8152 | 8484 | Original plus OpenAddresses/Overture samples |
+| CO | Colorado | 230 | 1912 | 2142 | Original plus OpenAddresses/Overture samples |
+| CT | Connecticut | 196 | 1393 | 1589 | Original plus OpenAddresses/Overture samples |
+| DE | Delaware | 0 | 407 | 407 | Added from OpenAddresses/Overture samples |
+| DC | District of Columbia | 196 | 300 | 496 | Original plus OpenAddresses/Overture samples |
+| FL | Florida | 208 | 4680 | 4888 | Original plus OpenAddresses/Overture samples |
+| GA | Georgia | 192 | 385 | 577 | Original plus OpenAddresses/Overture samples |
+| HI | Hawaii | 0 | 42 | 42 | Added from OpenAddresses/Overture samples |
+| ID | Idaho | 0 | 475 | 475 | Added from OpenAddresses/Overture samples |
+| IL | Illinois | 0 | 6937 | 6937 | Added from OpenAddresses/Overture samples |
+| IN | Indiana | 0 | 3952 | 3952 | Added from OpenAddresses/Overture samples |
+| IA | Iowa | 0 | 4696 | 4696 | Added from OpenAddresses/Overture samples |
+| KS | Kansas | 0 | 3007 | 3007 | Added from OpenAddresses/Overture samples |
+| KY | Kentucky | 190 | 3618 | 3808 | Original plus OpenAddresses/Overture samples |
+| LA | Louisiana | 0 | 266 | 266 | Added from OpenAddresses/Overture samples |
+| ME | Maine | 0 | 2156 | 2156 | Added from OpenAddresses/Overture samples |
+| MD | Maryland | 187 | 2227 | 2414 | Original plus OpenAddresses/Overture samples |
+| MA | Massachusetts | 188 | 2632 | 2820 | Original plus OpenAddresses/Overture samples |
+| MI | Michigan | 0 | 900 | 900 | Added from OpenAddresses/Overture samples |
+| MN | Minnesota | 0 | 4206 | 4206 | Added from OpenAddresses/Overture samples |
+| MS | Mississippi | 0 | 1733 | 1733 | Added from OpenAddresses/Overture samples |
+| MO | Missouri | 0 | 2002 | 2002 | Added from OpenAddresses/Overture samples |
+| MT | Montana | 0 | 1858 | 1858 | Added from OpenAddresses/Overture samples |
+| NE | Nebraska | 0 | 780 | 780 | Added from OpenAddresses/Overture samples |
+| NV | Nevada | 0 | 63 | 63 | Added from OpenAddresses/Overture samples |
+| NH | New Hampshire | 0 | 0 | 0 | Not represented by the current complete-record sources |
+| NJ | New Jersey | 0 | 3013 | 3013 | Added from OpenAddresses/Overture samples |
+| NM | New Mexico | 0 | 1692 | 1692 | Added from OpenAddresses/Overture samples |
+| NY | New York | 0 | 8650 | 8650 | Added from OpenAddresses/Overture samples |
+| NC | North Carolina | 0 | 3962 | 3962 | Added from OpenAddresses/Overture samples |
+| ND | North Dakota | 0 | 2018 | 2018 | Added from OpenAddresses/Overture samples |
+| OH | Ohio | 0 | 6022 | 6022 | Added from OpenAddresses/Overture samples |
+| OK | Oklahoma | 175 | 2926 | 3101 | Original plus OpenAddresses/Overture samples |
+| OR | Oregon | 0 | 2973 | 2973 | Added from OpenAddresses/Overture samples |
+| PA | Pennsylvania | 0 | 1606 | 1606 | Added from OpenAddresses/Overture samples |
+| RI | Rhode Island | 0 | 145 | 145 | Added from OpenAddresses/Overture samples |
+| SC | South Carolina | 0 | 218 | 218 | Added from OpenAddresses/Overture samples |
+| SD | South Dakota | 0 | 188 | 188 | Added from OpenAddresses/Overture samples |
+| TN | Tennessee | 195 | 3630 | 3825 | Original plus OpenAddresses/Overture samples |
+| TX | Texas | 0 | 8119 | 8119 | Added from OpenAddresses/Overture samples |
+| UT | Utah | 0 | 1568 | 1568 | Added from OpenAddresses/Overture samples |
+| VT | Vermont | 175 | 1289 | 1464 | Original plus OpenAddresses/Overture samples |
+| VA | Virginia | 50 | 4412 | 4462 | Original plus OpenAddresses/Overture samples |
+| WA | Washington | 0 | 2834 | 2834 | Added from OpenAddresses/Overture samples |
+| WV | West Virginia | 0 | 3698 | 3698 | Added from OpenAddresses/Overture samples |
+| WI | Wisconsin | 0 | 2988 | 2988 | Added from OpenAddresses/Overture samples |
+| WY | Wyoming | 0 | 391 | 391 | Added from OpenAddresses/Overture samples |
 
-| **Total** |  | **3270** | **1728** | **4998** |  |
+| **Total** |  | **3270** | **129156** | **132426** |  |
+
+New Hampshire remains omitted because the checked complete-record sources did not provide usable ZIP-coded address points for this branch.
