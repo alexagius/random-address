@@ -41,3 +41,14 @@ def test_packaged_records_have_broad_zip_coverage():
     assert len(postal_counts) > 26000
     assert sum(1 for count in postal_counts.values() if count >= 5) > 24000
     assert sum(1 for count in postal_counts.values() if count >= 10) > 24000
+
+
+def test_packaged_records_include_new_hampshire():
+    nh_addresses = [
+        address for address in load_addresses()
+        if address["state"] == "NH"
+    ]
+    nh_postal_codes = {address["postalCode"] for address in nh_addresses}
+
+    assert len(nh_addresses) > 2000
+    assert len(nh_postal_codes) > 200

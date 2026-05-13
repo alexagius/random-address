@@ -72,6 +72,14 @@ Netsyms source files belong under `data/sources/`, which is ignored by git.
 Review the source terms before redistributing any records imported from that
 database.
 
+New Hampshire is imported from NH GRANIT's public parcel point layer and
+companion geocoder because the OpenAddresses and Overture sources checked for
+this branch did not provide complete ZIP-coded NH records:
+
+```powershell
+python data\import_nh_granit_addresses.py --per-postal-code 10
+```
+
 The ingestion script accepts OpenAddresses-style CSV files, GeoJSON
 FeatureCollections, and newline-delimited GeoJSON Features:
 
