@@ -64,9 +64,9 @@ These functions allow you to inspect the dataset contents:
 
 >>> random_address.get_summary()
 {
-    'total_addresses': 132426,
+    'total_addresses': 252721,
     'unique_states': 50,
-    'unique_cities': 17476,
+    'unique_cities': 18100,
     'unique_postal_codes': 26282
 }
 ```

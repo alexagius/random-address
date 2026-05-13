@@ -29,7 +29,7 @@ def test_packaged_records_are_complete():
 def test_packaged_records_include_address2_values():
     addresses = load_addresses()
 
-    assert sum(1 for address in addresses if address.get("address2")) > 9000
+    assert sum(1 for address in addresses if address.get("address2")) > 18000
 
 
 def test_packaged_records_have_broad_zip_coverage():
@@ -40,3 +40,4 @@ def test_packaged_records_have_broad_zip_coverage():
 
     assert len(postal_counts) > 26000
     assert sum(1 for count in postal_counts.values() if count >= 5) > 24000
+    assert sum(1 for count in postal_counts.values() if count >= 10) > 24000
