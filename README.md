@@ -6,6 +6,42 @@ The original addresses were pulled from OpenAddress where the "Required attribut
 
 This project was inspired by [Real, Random Address Data (RRAD)](https://github.com/EthanRBrown/rrad) project.
 
+## About This Extended Fork
+
+This fork extends the original `neosergio/random-address` library while keeping
+the same Python import path:
+
+```python
+import random_address
+```
+
+Key additions in this fork:
+
+- PyPI distribution name: `random-address-extended`
+- Coverage expanded from the original packaged dataset's 3,270 records across
+  17 state/DC codes to 254,927 complete geocoded records across all 50 states
+  plus DC.
+- ZIP coverage expanded to 26,506 ZIP codes, including 24,277 ZIP codes with at
+  least 10 records and 24,720 ZIP codes with at least 5 records.
+- Added `real_random_addresses(...)` for batch sampling with optional state,
+  city, ZIP, seed, uniqueness, and fallback behavior.
+- Added reproducible ingestion workflows for OpenAddresses samples, Overture
+  Maps address samples, NH GRANIT New Hampshire data, and local Netsyms-style
+  SQLite address data.
+
+Additional data sources used by this fork:
+
+- [OpenAddresses](https://openaddresses.io/) public address samples.
+- [Overture Maps](https://overturemaps.org/) addresses theme.
+- [NH GRANIT](https://nhgeodata.unh.edu/) parcel points and geocoder for New
+  Hampshire ZIP-coded address coverage.
+- Optional local importer support for the
+  [Netsyms Address Database](https://netsyms.com/gis/addresses); Netsyms source
+  files are not committed to this repository.
+
+See `DATASET_COVERAGE.md` for the current state-by-state counts and
+`DATA_INGESTION.md` for the data refresh workflow.
+
 ![Travis (.com)](https://img.shields.io/travis/com/neosergio/random-address)
 ![PyPI](https://img.shields.io/pypi/v/random-address)
 ![PyPI - License](https://img.shields.io/pypi/l/random-address)
@@ -119,7 +155,13 @@ These functions allow you to inspect the dataset contents:
 
 ## Attribution
 
-Data is collected from the [OpenAddresses](https://openaddresses.io/) project and [Overture Maps](https://overturemaps.org/). The full generated attribution list is included in `random_address/addresses-us-all.min.json`. Original sources include:
+Data is collected from the [OpenAddresses](https://openaddresses.io/) project,
+[Overture Maps](https://overturemaps.org/), and
+[NH GRANIT](https://nhgeodata.unh.edu/). The repository also includes an
+optional local importer for the [Netsyms Address Database](https://netsyms.com/gis/addresses),
+but Netsyms source files are not committed to this package. The full generated
+attribution list is included in `random_address/addresses-us-all.min.json`.
+Original sources include:
 
 * City of Haddam (CT)
 * Ciy of Hartford (CT)

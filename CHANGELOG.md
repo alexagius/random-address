@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.3.1] - 2026-05-13
+### Added
+- Published this fork under the PyPI distribution name `random-address-extended` while keeping `import random_address`.
+- Expanded the packaged dataset to 254,927 complete geocoded records.
+- Expanded coverage to all 50 US states plus DC.
+- Expanded ZIP coverage to 26,506 ZIP codes, including 24,277 ZIP codes with at least 10 records and 24,720 ZIP codes with at least 5 records.
+- Added New Hampshire coverage from NH GRANIT parcel points and the NH GRANIT geocoder.
+- Added additional complete address samples from OpenAddresses and Overture Maps.
+- Added `real_random_addresses(...)` for batch sampling with optional state, city, ZIP, seed, uniqueness, and fallback behavior.
+- Added reproducible ingestion scripts for OpenAddresses samples, Overture Maps, NH GRANIT, and Netsyms-style SQLite sources.
+- Added `DATASET_COVERAGE.md`, `DATA_INGESTION.md`, and `PYPI_PUBLISHING.md`.
+- Added GitHub Actions trusted publishing workflow for TestPyPI and PyPI.
+
+### Changed
+- New imported records are kept only when they include address line 1, city, state, 5-digit ZIP code, and coordinates.
+- README now documents this fork's coverage, added data sources, and batch helper behavior.
+- Package metadata now points to this fork's GitHub repository.
+
 ## [1.3.0] - 2025-04-07
 ### Added
 - Added functions `list_available_states`, `list_available_postal_codes`, and `list_available_cities` to explore dataset content.
@@ -57,6 +75,7 @@
 ### Added
 - First public preview release.
 
+[1.3.1]: https://github.com/alexagius/random-address/compare/v1.3.0...v1.3.1-extended
 [1.3.0]: https://github.com/neosergio/random-address/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/neosergio/random-address/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/neosergio/random-address/compare/v1.1.1...v1.2.0
