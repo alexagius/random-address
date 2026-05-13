@@ -8,10 +8,9 @@ with open("README.md", 'r') as fh:
     long_description = fh.read()
 
 setup(
-    name='random-address',
+    name='random-address-extended',
     version='1.3.1',
-    description='Tool to retrieve a real random address '
-                'that geocode successfully',
+    description='Extended fork of random-address with broader coverage and batch sampling',
     packages=['random_address'],
     package_data={'random_address': ['addresses-us-all.min.json']},
     include_package_data=True,
@@ -42,12 +41,14 @@ setup(
             "pytest>=3.7",
         ],
     },
-    url='https://github.com/neosergio/random-address',
+    url='https://github.com/alexagius/random-address',
     author='Sergio Infante',
     author_email='raulsergio9@gmail.com',
+    maintainer='alexagius',
     project_urls={
-        'Issue Tracker': 'https://github.com/neosergio/random-address/issues',
-        'Source Code': 'https://github.com/neosergio/random-address',
-        'Changelog': 'https://github.com/neosergio/random-address/blob/main/CHANGELOG.md',
+        'Issue Tracker': 'https://github.com/alexagius/random-address/issues',
+        'Source Code': 'https://github.com/alexagius/random-address',
+        'Changelog': 'https://github.com/alexagius/random-address/blob/main/CHANGELOG.md',
+        'Upstream': 'https://github.com/neosergio/random-address',
     }
 )

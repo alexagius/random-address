@@ -22,6 +22,18 @@ Run the following to install:
 $ pip install random-address
 ```
 
+This extended fork can be installed from PyPI as:
+
+```bash
+$ pip install random-address-extended
+```
+
+The Python import remains:
+
+```python
+import random_address
+```
+
 ## Usage
 
 ```python
