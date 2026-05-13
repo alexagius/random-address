@@ -1,7 +1,10 @@
 """
 Tests for random_address module
 """
+import pytest
+
 from random_address import real_random_address
+from random_address import real_random_addresses
 from random_address import real_random_address_by_state
 from random_address import real_random_address_by_postal_code
 from random_address import list_available_states
@@ -67,3 +70,69 @@ def test_real_random_address_by_postal_code():
 def test_real_random_address_by_postal_code_with_no_results():
     """Test return with a postal code with no results"""
     assert not real_random_address_by_postal_code('00000')
+
+
+def test_real_random_addresses_returns_seeded_batch():
+    """Test batch helper returns reproducible batches."""
+    first_batch = real_random_addresses(count=5, state='NH', seed=123)
+    second_batch = real_random_addresses(count=5, state='NH', seed=123)
+
+    assert len(first_batch) == 5
+    assert first_batch == second_batch
+    assert all(address.get('state') == 'NH' for address in first_batch)
+
+
+def test_real_random_addresses_default_fallback_expands_short_city_zip_match():
+    """Test default fallback fills from same city or ZIP when exact match is short."""
+    strict_matches = real_random_addresses(
+        count=20,
+        state='KY',
+        postal_code='40214',
+        city='Louisville',
+        fallback='none',
+        seed=123,
+    )
+    fallback_matches = real_random_addresses(
+        count=20,
+        state='KY',
+        postal_code='40214',
+        city='Louisville',
+        seed=123,
+    )
+
+    assert 0 < len(strict_matches) < 20
+    assert len(fallback_matches) == 20
+    assert all(address in fallback_matches for address in strict_matches)
+    assert all(address.get('state') == 'KY' for address in fallback_matches)
+    assert all(
+        address.get('postalCode') == '40214'
+        or address.get('city', '').lower() == 'louisville'
+        for address in fallback_matches
+    )
+    assert any(
+        address.get('postalCode') != '40214'
+        or address.get('city', '').lower() != 'louisville'
+        for address in fallback_matches
+    )
+
+
+def test_real_random_addresses_can_fallback_to_postal_code_only():
+    """Test postal-code fallback keeps the ZIP hard-filtered."""
+    addresses = real_random_addresses(
+        count=10,
+        state='KY',
+        postal_code='40214',
+        city='Louisville',
+        fallback='postal_code',
+        seed=123,
+    )
+
+    assert len(addresses) == 10
+    assert all(address.get('state') == 'KY' for address in addresses)
+    assert all(address.get('postalCode') == '40214' for address in addresses)
+
+
+def test_real_random_addresses_rejects_unknown_fallback():
+    """Test fallback names are validated."""
+    with pytest.raises(ValueError):
+        real_random_addresses(count=1, fallback='nearby')

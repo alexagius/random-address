@@ -42,6 +42,26 @@ There are other 3 functions that can be used:
 {'address1': '37600 Sycamore Street', 'address2': '', 'city': 'Newark', 'state': 'CA', 'postalCode': '94560', 'coordinates': {'lat': 37.5261943, 'lng': -122.0304698}}
 ```
 
+Batch sampling is also available:
+```python
+>>> random_address.real_random_addresses(count=3, state='NH', seed=123)
+[{'address1': '9 DUCK POND CIRCLE', ...}, ...]
+
+>>> random_address.real_random_addresses(
+...     count=100,
+...     state='KY',
+...     postal_code='40214',
+...     city='Louisville',
+... )
+```
+
+When both `postal_code` and `city` are provided, the batch helper first uses
+strict matches. If there are not enough strict matches, the default
+`fallback='city_or_postal_code'` fills the remaining batch from the same city or
+same ZIP code while keeping `state` as a hard filter when provided. Use
+`fallback='none'`, `fallback='postal_code'`, or `fallback='city'` to change
+that behavior.
+
 These functions allow you to inspect the dataset contents:
 ```python
 >>> random_address.list_available_states()
@@ -83,6 +103,7 @@ These functions allow you to inspect the dataset contents:
 - `real_random_address_by_state(state: str)`: Retrieve a random address filtered by US state code.
 - `real_random_address_by_postal_code(postal_code: str)`: Retrieve a random address filtered by US postal code.
 - `real_random_address_by_city(city: str)`: Retrieve a random address filtered by US city.
+- `real_random_addresses(...)`: Retrieve a batch of random addresses with optional state, city, ZIP, seed, uniqueness, and fallback behavior.
 
 ## Attribution
 
