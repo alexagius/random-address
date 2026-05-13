@@ -7,10 +7,11 @@ import logging
 import os
 import random
 import sys
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from collections import Counter
 
 logger = logging.getLogger(__name__)
+FALLBACK_OPTIONS = {"none", "postal_code", "city", "city_or_postal_code"}
 
 
 def _get_address_dict_list() -> Dict[str, List[Dict[str, Any]]]:
@@ -153,6 +154,167 @@ def real_random_address_by_city(city: str) -> Dict[str, Any]:
         if addr.get("city") and addr.get("city").lower() == city.lower()
     ]
     return random.choice(filtered_data) if filtered_data else {}
+
+
+def real_random_addresses(
+    count: int = 1,
+    state: Optional[str] = None,
+    postal_code: Optional[str] = None,
+    city: Optional[str] = None,
+    seed: Optional[int] = None,
+    unique: bool = True,
+    fallback: str = "city_or_postal_code",
+) -> List[Dict[str, Any]]:
+    """Retrieve a batch of random real addresses.
+
+    Args:
+        count (int): Maximum number of addresses to return.
+        state (str, optional): Two-letter state abbreviation.
+        postal_code (str, optional): Five-digit postal code.
+        city (str, optional): City name.
+        seed (int, optional): Random seed for reproducible batches.
+        unique (bool): Return each matching address at most once when True.
+        fallback (str): How to fill a short result when both city and
+            postal_code are provided. Defaults to "city_or_postal_code".
+            Supported values are "none", "postal_code", "city", and
+            "city_or_postal_code".
+
+    Returns:
+        list: Random address dictionaries matching the requested filters.
+    """
+    if count <= 0:
+        return []
+    if fallback not in FALLBACK_OPTIONS:
+        raise ValueError(f"fallback must be one of {sorted(FALLBACK_OPTIONS)}")
+
+    data = _get_address_dict_list()
+    addresses = data.get("addresses", [])
+    primary_matches = [
+        address for address in addresses
+        if _address_matches(address, state=state, postal_code=postal_code, city=city)
+    ]
+
+    if _should_use_fallback(
+        requested_count=count,
+        current_count=len(primary_matches),
+        city=city,
+        postal_code=postal_code,
+        fallback=fallback,
+        unique=unique,
+    ):
+        rng = random.Random(seed) if seed is not None else random
+        primary_sample = _sample_addresses(
+            primary_matches,
+            count=count,
+            rng=rng,
+            unique=unique,
+        )
+        primary_keys = {_address_identity(address) for address in primary_matches}
+        fallback_matches = [
+            address for address in addresses
+            if _address_matches_fallback(
+                address,
+                state=state,
+                postal_code=postal_code,
+                city=city,
+                fallback=fallback,
+            )
+            and _address_identity(address) not in primary_keys
+        ]
+        fallback_sample = _sample_addresses(
+            fallback_matches,
+            count=count - len(primary_sample),
+            rng=rng,
+            unique=unique,
+        )
+        return primary_sample + fallback_sample
+
+    rng = random.Random(seed) if seed is not None else random
+    return _sample_addresses(primary_matches, count=count, rng=rng, unique=unique)
+
+
+def _address_matches(
+    address: Dict[str, Any],
+    state: Optional[str] = None,
+    postal_code: Optional[str] = None,
+    city: Optional[str] = None,
+) -> bool:
+    if state and address.get("state") != state.upper():
+        return False
+    if postal_code and address.get("postalCode") != str(postal_code):
+        return False
+    if city and clean_text(address.get("city")) != clean_text(city):
+        return False
+    return True
+
+
+def _address_matches_fallback(
+    address: Dict[str, Any],
+    state: Optional[str],
+    postal_code: Optional[str],
+    city: Optional[str],
+    fallback: str,
+) -> bool:
+    if state and address.get("state") != state.upper():
+        return False
+
+    matches_postal_code = address.get("postalCode") == str(postal_code)
+    matches_city = clean_text(address.get("city")) == clean_text(city)
+    if fallback == "postal_code":
+        return matches_postal_code
+    if fallback == "city":
+        return matches_city
+    return matches_city or matches_postal_code
+
+
+def _should_use_fallback(
+    requested_count: int,
+    current_count: int,
+    city: Optional[str],
+    postal_code: Optional[str],
+    fallback: str,
+    unique: bool,
+) -> bool:
+    if fallback == "none" or not city or not postal_code:
+        return False
+    if unique:
+        return current_count < requested_count
+    return current_count == 0
+
+
+def _sample_addresses(
+    addresses: List[Dict[str, Any]],
+    count: int,
+    rng: Any,
+    unique: bool,
+) -> List[Dict[str, Any]]:
+    if not addresses or count <= 0:
+        return []
+
+    if unique:
+        if count >= len(addresses):
+            shuffled = list(addresses)
+            rng.shuffle(shuffled)
+            return shuffled
+        return rng.sample(addresses, count)
+
+    return [rng.choice(addresses) for _ in range(count)]
+
+
+def _address_identity(address: Dict[str, Any]) -> tuple:
+    return (
+        clean_text(address.get("address1")),
+        clean_text(address.get("address2")),
+        clean_text(address.get("city")),
+        address.get("state"),
+        address.get("postalCode"),
+    )
+
+
+def clean_text(value: Any) -> str:
+    if value is None:
+        return ""
+    return " ".join(str(value).strip().lower().split())
 
 
 def list_available_states() -> List[str]:
