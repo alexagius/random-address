@@ -1,13 +1,20 @@
 import json
+import gzip
+from functools import lru_cache
 from pathlib import Path
 
 
-DATASET_PATH = Path(__file__).resolve().parents[1] / "random_address" / "addresses-us-all.min.json"
+DATASET_PATH = Path(__file__).resolve().parents[1] / "random_address" / "addresses-us-all.min.json.gz"
+
+
+@lru_cache(maxsize=1)
+def load_dataset():
+    with gzip.open(DATASET_PATH, "rt", encoding="utf-8") as dataset_file:
+        return json.load(dataset_file)
 
 
 def load_addresses():
-    with DATASET_PATH.open("r", encoding="utf-8") as dataset_file:
-        return json.load(dataset_file)["addresses"]
+    return load_dataset()["addresses"]
 
 
 def test_packaged_records_are_complete():
@@ -52,3 +59,20 @@ def test_packaged_records_include_new_hampshire():
 
     assert len(nh_addresses) > 2000
     assert len(nh_postal_codes) > 200
+
+
+def test_packaged_records_include_precomputed_clusters():
+    data = load_dataset()
+    addresses = data["addresses"]
+    clusters = data.get("clusters", [])
+
+    assert len(clusters) > 23000
+    for cluster in clusters:
+        address_indexes = cluster.get("address_indexes", [])
+        assert len(address_indexes) == cluster["count"] == 35
+        for address_index in address_indexes:
+            assert isinstance(address_index, int)
+            assert 0 <= address_index < len(addresses)
+            address = addresses[address_index]
+            assert address["state"] == cluster["state"]
+            assert address["postalCode"] == cluster["postalCode"]

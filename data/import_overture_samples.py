@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence
 
+from address_clusters import attach_clusters
 from ingest_addresses import (
     DEFAULT_DATASET,
     VALID_STATES,
@@ -64,6 +65,8 @@ def build_query(args: argparse.Namespace) -> str:
     path = overture_path(args)
     states_sql = state_filter(args.states or sorted(VALID_STATES))
     per_postal_code = int(args.per_postal_code)
+    cluster_grid_scale = float(args.cluster_grid_scale)
+    sample_order = sample_rank_order(args)
     limit_clause = f"\nLIMIT {int(args.limit)}" if args.limit else ""
 
     return f"""
@@ -99,6 +102,19 @@ WITH candidates AS (
             nullif(trim(address_levels[2].value), '')
         )) <> 'not stated'
         AND geometry IS NOT NULL
+), scored AS (
+    SELECT
+        *,
+        floor(lat * {cluster_grid_scale}) AS lat_bucket,
+        floor(lng * {cluster_grid_scale}) AS lng_bucket
+    FROM candidates
+), ranked AS (
+    SELECT
+        *,
+        count(*) OVER (
+            PARTITION BY state, postalCode, lat_bucket, lng_bucket
+        ) AS grid_count
+    FROM scored
 ), sampled AS (
     SELECT
         address1,
@@ -110,15 +126,21 @@ WITH candidates AS (
         lng,
         row_number() OVER (
             PARTITION BY state, postalCode
-            ORDER BY hash(id)
+            ORDER BY {sample_order}
         ) AS sample_rank
-    FROM candidates
+    FROM ranked
 )
 SELECT address1, address2, city, state, postalCode, lat, lng
 FROM sampled
 WHERE sample_rank <= {per_postal_code}
 ORDER BY state, postalCode, city, address1, address2{limit_clause}
 """.strip()
+
+
+def sample_rank_order(args: argparse.Namespace) -> str:
+    if args.sample_mode == "clustered":
+        return "grid_count DESC, lat_bucket, lng_bucket, hash(id)"
+    return "hash(id)"
 
 
 def rows_to_addresses(rows: Iterable[Sequence[Any]]) -> List[Address]:
@@ -150,6 +172,11 @@ def fetch_overture_addresses(args: argparse.Namespace) -> List[Address]:
     connection.execute("INSTALL spatial")
     connection.execute("LOAD spatial")
     connection.execute("SET s3_region='us-west-2'")
+    connection.execute(f"SET http_timeout={int(args.http_timeout)}")
+    connection.execute(f"SET http_retries={int(args.http_retries)}")
+    connection.execute(f"SET http_retry_wait_ms={int(args.http_retry_wait_ms)}")
+    connection.execute("SET enable_http_metadata_cache=true")
+    connection.execute("SET httpfs_connection_caching=true")
     rows = connection.execute(build_query(args)).fetchall()
     return rows_to_addresses(rows)
 
@@ -169,6 +196,14 @@ def import_samples(args: argparse.Namespace) -> Dict[str, Any]:
 
     incoming = dedupe_addresses(existing_addresses, incoming)
     data["addresses"] = existing_addresses + incoming
+    if args.build_clusters:
+        attach_clusters(
+            data,
+            cluster_size=args.cluster_size,
+            min_postal_code_count=args.min_cluster_postal_code_count,
+        )
+    else:
+        data.pop("clusters", None)
 
     attributions = list(data.get("attribution", []))
     source_attribution = attribution(args)
@@ -178,6 +213,8 @@ def import_samples(args: argparse.Namespace) -> Dict[str, Any]:
 
     print("Imported:", json.dumps(summarize(incoming), sort_keys=True))
     print("Merged:", json.dumps(summarize(data["addresses"]), sort_keys=True))
+    if args.build_clusters:
+        print("Clusters:", json.dumps({"clusters": len(data["clusters"])}, sort_keys=True))
 
     if not args.dry_run:
         write_dataset(args.output, data, pretty=args.pretty)
@@ -199,8 +236,38 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser.add_argument(
         "--per-postal-code",
         type=int,
-        default=5,
+        default=35,
         help="Maximum Overture addresses to keep per state/ZIP pair.",
+    )
+    parser.add_argument(
+        "--sample-mode",
+        choices=("random", "clustered"),
+        default="clustered",
+        help="Sample records randomly or by densest coordinate grid cell per state/ZIP.",
+    )
+    parser.add_argument(
+        "--cluster-grid-scale",
+        type=float,
+        default=100.0,
+        help="Grid scale for clustered Overture sampling. 100 means 0.01 degree cells.",
+    )
+    parser.add_argument(
+        "--http-timeout",
+        type=int,
+        default=180,
+        help="DuckDB httpfs timeout in seconds for long S3 parquet scans.",
+    )
+    parser.add_argument(
+        "--http-retries",
+        type=int,
+        default=8,
+        help="DuckDB httpfs retry count for transient S3 read failures.",
+    )
+    parser.add_argument(
+        "--http-retry-wait-ms",
+        type=int,
+        default=500,
+        help="Initial DuckDB httpfs retry wait in milliseconds.",
     )
     parser.add_argument(
         "--release",
@@ -238,6 +305,23 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
         help="Replace the packaged address list instead of merging into it.",
     )
     parser.add_argument(
+        "--build-clusters",
+        action="store_true",
+        help="Regenerate compact ZIP-level cluster metadata after importing.",
+    )
+    parser.add_argument(
+        "--cluster-size",
+        type=int,
+        default=35,
+        help="Number of nearby addresses to store in each generated ZIP cluster.",
+    )
+    parser.add_argument(
+        "--min-cluster-postal-code-count",
+        type=int,
+        default=6,
+        help="Minimum records required before a ZIP can receive cluster metadata.",
+    )
+    parser.add_argument(
         "--pretty",
         action="store_true",
         help="Write formatted JSON instead of the package's minified JSON.",
@@ -250,6 +334,18 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     args = parser.parse_args(argv)
     if args.per_postal_code < 1:
         parser.error("--per-postal-code must be at least 1")
+    if args.cluster_grid_scale <= 0:
+        parser.error("--cluster-grid-scale must be greater than 0")
+    if args.http_timeout < 1:
+        parser.error("--http-timeout must be at least 1")
+    if args.http_retries < 0:
+        parser.error("--http-retries must be non-negative")
+    if args.http_retry_wait_ms < 0:
+        parser.error("--http-retry-wait-ms must be non-negative")
+    if args.cluster_size < 1:
+        parser.error("--cluster-size must be at least 1")
+    if args.min_cluster_postal_code_count < 1:
+        parser.error("--min-cluster-postal-code-count must be at least 1")
     if args.limit is not None and args.limit < 1:
         parser.error("--limit must be at least 1")
     return args

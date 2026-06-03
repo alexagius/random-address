@@ -12,7 +12,7 @@ setup(
     version='1.3.1',
     description='Extended fork of random-address with broader coverage and batch sampling',
     packages=['random_address'],
-    package_data={'random_address': ['addresses-us-all.min.json']},
+    package_data={'random_address': ['addresses-us-all.min.json.gz']},
     include_package_data=True,
     python_requires='>=3.6',
     classifiers=[

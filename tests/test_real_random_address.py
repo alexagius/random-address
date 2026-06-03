@@ -2,8 +2,10 @@
 Tests for random_address module
 """
 import pytest
+import random_address.random_address as random_address_module
 
 from random_address import real_random_address
+from random_address import real_random_address_cluster
 from random_address import real_random_addresses
 from random_address import real_random_address_by_state
 from random_address import real_random_address_by_postal_code
@@ -87,7 +89,7 @@ def test_real_random_addresses_default_fallback_expands_short_city_zip_match():
     strict_matches = real_random_addresses(
         count=20,
         state='KY',
-        postal_code='40214',
+        postal_code='40223',
         city='Louisville',
         fallback='none',
         seed=123,
@@ -95,7 +97,7 @@ def test_real_random_addresses_default_fallback_expands_short_city_zip_match():
     fallback_matches = real_random_addresses(
         count=20,
         state='KY',
-        postal_code='40214',
+        postal_code='40223',
         city='Louisville',
         seed=123,
     )
@@ -105,12 +107,12 @@ def test_real_random_addresses_default_fallback_expands_short_city_zip_match():
     assert all(address in fallback_matches for address in strict_matches)
     assert all(address.get('state') == 'KY' for address in fallback_matches)
     assert all(
-        address.get('postalCode') == '40214'
+        address.get('postalCode') == '40223'
         or address.get('city', '').lower() == 'louisville'
         for address in fallback_matches
     )
     assert any(
-        address.get('postalCode') != '40214'
+        address.get('postalCode') != '40223'
         or address.get('city', '').lower() != 'louisville'
         for address in fallback_matches
     )
@@ -136,3 +138,79 @@ def test_real_random_addresses_rejects_unknown_fallback():
     """Test fallback names are validated."""
     with pytest.raises(ValueError):
         real_random_addresses(count=1, fallback='nearby')
+
+
+def test_real_random_address_cluster_returns_seeded_zip_batch():
+    """Test clustered sampling returns a reproducible same-ZIP batch."""
+    first_cluster = real_random_address_cluster(count=25, postal_code='06040', seed=123)
+    second_cluster = real_random_address_cluster(count=25, postal_code='06040', seed=123)
+
+    assert len(first_cluster) == 25
+    assert first_cluster == second_cluster
+    assert all(address.get('postalCode') == '06040' for address in first_cluster)
+    assert len({
+        (
+            address.get('address1'),
+            address.get('address2'),
+            address.get('city'),
+            address.get('state'),
+            address.get('postalCode'),
+        )
+        for address in first_cluster
+    }) == 25
+
+
+def test_real_random_address_cluster_requires_enough_zip_records():
+    """Test clustered sampling rejects ZIP groups below the requested depth."""
+    assert not real_random_address_cluster(count=25, postal_code='94560', seed=123)
+
+
+def test_real_random_address_cluster_rejects_invalid_options():
+    """Test clustered sampling validates count options."""
+    with pytest.raises(ValueError):
+        real_random_address_cluster(count=1, min_postal_code_count=0)
+    with pytest.raises(ValueError):
+        real_random_address_cluster(count=1, max_radius_km=-1)
+
+
+def test_real_random_address_cluster_uses_precomputed_metadata(monkeypatch):
+    """Test clustered sampling prefers build-time cluster metadata when available."""
+    addresses = [
+        {
+            "address1": f"{index} Main Street",
+            "address2": "",
+            "city": "Albany",
+            "state": "NY",
+            "postalCode": "12207",
+            "coordinates": {"lat": 42.0 + (index * 0.0001), "lng": -73.0},
+        }
+        for index in range(6)
+    ]
+    data = {
+        "addresses": addresses,
+        "clusters": [
+            {
+                "id": "NY-12207-00001",
+                "state": "NY",
+                "postalCode": "12207",
+                "address_indexes": [5, 4, 3, 2, 1, 0],
+            }
+        ],
+    }
+    random_address_module._get_indexes.cache_clear()
+    monkeypatch.setattr(random_address_module, "_get_address_dict_list", lambda: data)
+
+    try:
+        cluster = random_address_module.real_random_address_cluster(
+            count=3,
+            postal_code="12207",
+            seed=123,
+        )
+    finally:
+        random_address_module._get_indexes.cache_clear()
+
+    assert [address["address1"] for address in cluster] == [
+        "5 Main Street",
+        "4 Main Street",
+        "3 Main Street",
+    ]

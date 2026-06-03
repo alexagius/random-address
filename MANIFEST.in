@@ -1,3 +1,4 @@
 include *.txt
 recursive-include random_address *.json
+recursive-include random_address *.json.gz
 recursive-include tests *.py

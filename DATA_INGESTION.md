@@ -52,11 +52,25 @@ GeoParquet files directly:
 
 ```powershell
 python -m pip install duckdb
-python data\import_overture_samples.py --per-postal-code 5
+python data\import_overture_samples.py `
+  --per-postal-code 35 `
+  --sample-mode clustered `
+  --build-clusters
 ```
 
-This keeps up to five complete, geocoded addresses per state/ZIP pair when the
-source provides them. Use `--per-postal-code 10` for a larger local fork.
+This keeps up to 35 complete, geocoded addresses per state/ZIP pair when the
+source provides them. `--sample-mode clustered` ranks candidates from the
+densest coordinate grid cells inside each state/ZIP before applying the per-ZIP
+limit, which favors nearby latitude/longitude groups over random spread.
+`--build-clusters` writes precomputed cluster metadata into the dataset so
+runtime cluster sampling does not need to calculate proximity from scratch.
+
+If you already have the desired records and only need to rebuild cluster
+metadata, run:
+
+```powershell
+python data\build_address_clusters.py --cluster-size 35
+```
 
 The Netsyms address database can also be tested locally after downloading a
 SQLite file from their site:
@@ -97,11 +111,13 @@ Useful options:
 - `--dry-run`: print the incoming and merged counts without writing the package
   dataset.
 - `--per-postal-code N`: keep up to `N` addresses per ZIP code.
+- For generic `ingest_addresses.py`, cluster metadata is removed after a merge;
+  rerun `data\build_address_clusters.py` when the dataset is final.
 - `--limit N`: cap the total incoming addresses after ZIP sampling.
 - `--replace-state`: remove existing records for the state before adding new
   records.
 - `--pretty`: write readable JSON when inspecting output. Leave this off for the
-  minified package file.
+  compressed minified package file.
 
 After a successful merge, run tests:
 
@@ -115,7 +131,7 @@ is ignored by git.
 Then commit and push:
 
 ```powershell
-git add data\ingest_addresses.py tests\test_ingest_addresses.py DATA_INGESTION.md random_address\addresses-us-all.min.json
+git add data\ingest_addresses.py tests\test_ingest_addresses.py DATA_INGESTION.md random_address\addresses-us-all.min.json.gz
 git commit -m "Add address ingestion workflow"
 git push
 ```

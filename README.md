@@ -19,10 +19,13 @@ Key additions in this fork:
 
 - PyPI distribution name: `random-address-extended`
 - Coverage expanded from the original packaged dataset's 3,270 records across
-  17 state/DC codes to 254,927 complete geocoded records across all 50 states
+  17 state/DC codes to 1,031,008 complete geocoded records across all 50 states
   plus DC.
-- ZIP coverage expanded to 26,506 ZIP codes, including 24,277 ZIP codes with at
-  least 10 records and 24,720 ZIP codes with at least 5 records.
+- ZIP coverage expanded to 26,506 ZIP codes, including 23,326 ZIP codes with at
+  least 35 records, 23,683 ZIP codes with at least 25 records, and 24,724 ZIP
+  codes with at least 5 records.
+- Added precomputed ZIP cluster metadata for 23,340 compact latitude/longitude
+  groups.
 - Added `real_random_addresses(...)` for batch sampling with optional state,
   city, ZIP, seed, uniqueness, and fallback behavior.
 - Added reproducible ingestion workflows for OpenAddresses samples, Overture
@@ -110,6 +113,23 @@ same ZIP code while keeping `state` as a hard filter when provided. Use
 `fallback='none'`, `fallback='postal_code'`, or `fallback='city'` to change
 that behavior.
 
+Clustered sampling can return a geographically compact group from one ZIP code:
+```python
+>>> random_address.real_random_address_cluster(
+...     count=25,
+...     postal_code='06040',
+...     seed=123,
+... )
+[{'address1': '310 Timrod Road', ...}, ...]
+```
+
+Clustered sampling only uses ZIP groups with at least `count` records and at
+least `min_postal_code_count` records. The default `min_postal_code_count=6`
+keeps ZIPs with 1-5 records out of clustered results. When enough records are
+available, the helper uses precomputed build-time cluster metadata when present
+and otherwise falls back to nearby latitude/longitude points inside the selected
+ZIP.
+
 These functions allow you to inspect the dataset contents:
 ```python
 >>> random_address.list_available_states()
@@ -132,9 +152,9 @@ These functions allow you to inspect the dataset contents:
 
 >>> random_address.get_summary()
 {
-    'total_addresses': 254927,
+    'total_addresses': 1031008,
     'unique_states': 51,
-    'unique_cities': 18170,
+    'unique_cities': 18377,
     'unique_postal_codes': 26506
 }
 ```
@@ -152,6 +172,7 @@ These functions allow you to inspect the dataset contents:
 - `real_random_address_by_postal_code(postal_code: str)`: Retrieve a random address filtered by US postal code.
 - `real_random_address_by_city(city: str)`: Retrieve a random address filtered by US city.
 - `real_random_addresses(...)`: Retrieve a batch of random addresses with optional state, city, ZIP, seed, uniqueness, and fallback behavior.
+- `real_random_address_cluster(...)`: Retrieve a geographically compact batch from one ZIP code with optional state, city, ZIP, seed, minimum ZIP depth, and maximum radius filters.
 
 ## Attribution
 
@@ -160,7 +181,7 @@ Data is collected from the [OpenAddresses](https://openaddresses.io/) project,
 [NH GRANIT](https://nhgeodata.unh.edu/). The repository also includes an
 optional local importer for the [Netsyms Address Database](https://netsyms.com/gis/addresses),
 but Netsyms source files are not committed to this package. The full generated
-attribution list is included in `random_address/addresses-us-all.min.json`.
+attribution list is included in `random_address/addresses-us-all.min.json.gz`.
 Original sources include:
 
 * City of Haddam (CT)
@@ -293,4 +314,29 @@ To install random-address, along the tools you need to develop and run tests, ru
 
 ```bash
 $ pip install -e .[dev]
+```
+
+Run the normal test suite:
+
+```bash
+$ python -m pytest
+```
+
+Runtime performance checks are opt-in so they do not slow normal CI:
+
+```bash
+$ RUN_PERFORMANCE_TESTS=1 python -m pytest tests/test_performance.py
+```
+
+To refresh Overture data for clustered 25-35 address ZIP groups:
+
+```bash
+$ python -m pip install duckdb
+$ python data/import_overture_samples.py --per-postal-code 35 --sample-mode clustered --build-clusters
+```
+
+To rebuild cluster metadata from an existing dataset without fetching new data:
+
+```bash
+$ python data/build_address_clusters.py --cluster-size 35
 ```

@@ -7,6 +7,7 @@ delimited GeoJSON Features.
 
 import argparse
 import csv
+import gzip
 import json
 import random
 from collections import Counter, defaultdict
@@ -15,7 +16,7 @@ from typing import Any, Dict, Iterable, Iterator, List, Optional, Sequence, Tupl
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_DATASET = ROOT / "random_address" / "addresses-us-all.min.json"
+DEFAULT_DATASET = ROOT / "random_address" / "addresses-us-all.min.json.gz"
 VALID_STATES = {
     "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL",
     "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME",
@@ -30,7 +31,8 @@ Address = Dict[str, Any]
 
 
 def load_dataset(path: Path) -> Dict[str, Any]:
-    with path.open("r", encoding="utf-8") as source_file:
+    opener = gzip.open if path.suffix == ".gz" else open
+    with opener(path, "rt", encoding="utf-8") as source_file:
         data = json.load(source_file)
     data.setdefault("addresses", [])
     data.setdefault("attribution", [])
@@ -39,7 +41,8 @@ def load_dataset(path: Path) -> Dict[str, Any]:
 
 def write_dataset(path: Path, data: Dict[str, Any], pretty: bool = False) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as target_file:
+    opener = gzip.open if path.suffix == ".gz" else open
+    with opener(path, "wt", encoding="utf-8") as target_file:
         if pretty:
             json.dump(data, target_file, indent=2)
             target_file.write("\n")
@@ -304,6 +307,7 @@ def merge_dataset(
 
     incoming = dedupe_addresses(existing_addresses, incoming)
     data["addresses"] = existing_addresses + incoming
+    data.pop("clusters", None)
 
     if args.attribution and args.attribution not in existing_attribution:
         data["attribution"] = existing_attribution + [args.attribution]
@@ -324,7 +328,7 @@ def summarize(addresses: Iterable[Address]) -> Dict[str, Any]:
 
 def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Merge OpenAddresses-style source data into addresses-us-all.min.json."
+        description="Merge OpenAddresses-style source data into the packaged address dataset."
     )
     parser.add_argument(
         "--input",
