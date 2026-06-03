@@ -39,7 +39,7 @@ python data\import_openaddresses_samples.py
 ```
 
 By default, it imports public samples from up to three OpenAddresses sources per
-state that is not already represented in the packaged dataset. Records are only
+state that is not already represented in the working dataset. Records are only
 kept when they include `address1`, `city`, `state`, `postalCode`, and
 coordinates.
 
@@ -64,6 +64,17 @@ densest coordinate grid cells inside each state/ZIP before applying the per-ZIP
 limit, which favors nearby latitude/longitude groups over random spread.
 `--build-clusters` writes precomputed cluster metadata into the dataset so
 runtime cluster sampling does not need to calculate proximity from scratch.
+The importers update the compressed JSON working dataset at
+`data/work/addresses-us-all.min.json.gz`; build the packaged SQLite artifact
+after the working dataset is final:
+
+```powershell
+python data\build_sqlite_dataset.py
+```
+
+If the working JSON file does not exist yet, the ingestion helpers seed it from
+`random_address/addresses-us-all.sqlite` so refreshes still merge against the
+current packaged data.
 
 If you already have the desired records and only need to rebuild cluster
 metadata, run:
@@ -108,7 +119,7 @@ python data\ingest_addresses.py `
 
 Useful options:
 
-- `--dry-run`: print the incoming and merged counts without writing the package
+- `--dry-run`: print the incoming and merged counts without writing the working
   dataset.
 - `--per-postal-code N`: keep up to `N` addresses per ZIP code.
 - For generic `ingest_addresses.py`, cluster metadata is removed after a merge;
@@ -117,11 +128,12 @@ Useful options:
 - `--replace-state`: remove existing records for the state before adding new
   records.
 - `--pretty`: write readable JSON when inspecting output. Leave this off for the
-  compressed minified package file.
+  compressed minified working JSON file.
 
-After a successful merge, run tests:
+After a successful merge, rebuild the packaged SQLite file and run tests:
 
 ```powershell
+python data\build_sqlite_dataset.py
 python -m pytest
 ```
 
@@ -131,7 +143,7 @@ is ignored by git.
 Then commit and push:
 
 ```powershell
-git add data\ingest_addresses.py tests\test_ingest_addresses.py DATA_INGESTION.md random_address\addresses-us-all.min.json.gz
+git add data\ingest_addresses.py tests\test_ingest_addresses.py DATA_INGESTION.md random_address\addresses-us-all.sqlite
 git commit -m "Add address ingestion workflow"
 git push
 ```

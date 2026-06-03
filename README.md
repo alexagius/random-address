@@ -26,6 +26,8 @@ Key additions in this fork:
   codes with at least 5 records.
 - Added precomputed ZIP cluster metadata for 23,340 compact latitude/longitude
   groups.
+- Packaged data is stored in SQLite so imports do not need to inflate and parse
+  a 1M-record JSON document before the first lookup.
 - Added `real_random_addresses(...)` for batch sampling with optional state,
   city, ZIP, seed, uniqueness, and fallback behavior.
 - Added reproducible ingestion workflows for OpenAddresses samples, Overture
@@ -126,9 +128,8 @@ Clustered sampling can return a geographically compact group from one ZIP code:
 Clustered sampling only uses ZIP groups with at least `count` records and at
 least `min_postal_code_count` records. The default `min_postal_code_count=6`
 keeps ZIPs with 1-5 records out of clustered results. When enough records are
-available, the helper uses precomputed build-time cluster metadata when present
-and otherwise falls back to nearby latitude/longitude points inside the selected
-ZIP.
+available, the helper uses packaged build-time cluster metadata so runtime
+sampling stays fast and avoids proximity calculations on the full dataset.
 
 These functions allow you to inspect the dataset contents:
 ```python
@@ -181,7 +182,7 @@ Data is collected from the [OpenAddresses](https://openaddresses.io/) project,
 [NH GRANIT](https://nhgeodata.unh.edu/). The repository also includes an
 optional local importer for the [Netsyms Address Database](https://netsyms.com/gis/addresses),
 but Netsyms source files are not committed to this package. The full generated
-attribution list is included in `random_address/addresses-us-all.min.json.gz`.
+attribution list is included in `random_address/addresses-us-all.sqlite`.
 Original sources include:
 
 * City of Haddam (CT)

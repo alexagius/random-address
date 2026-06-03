@@ -6,12 +6,13 @@
 - Added precomputed ZIP cluster metadata for 23,340 compact latitude/longitude groups.
 - Added `real_random_address_cluster(...)` for clustered address sampling.
 - Added build-time cluster generation with `data/build_address_clusters.py`.
+- Added SQLite package building with `data/build_sqlite_dataset.py`.
 - Added opt-in runtime performance tests.
 
 ### Changed
 - Overture ingestion now defaults to 35 clustered records per state/ZIP and supports longer DuckDB HTTP timeouts for public S3 scans.
-- Runtime address lookups now use cached in-memory indexes for fast warm calls.
-- Packaged address data is stored as `addresses-us-all.min.json.gz` to stay under GitHub's single-file size limit.
+- Runtime address lookups now use the packaged SQLite database and compact range metadata instead of loading all addresses into memory.
+- Packaged address data is stored as `addresses-us-all.sqlite` to stay under GitHub's single-file size limit and improve cold startup.
 
 ## [1.3.1] - 2026-05-13
 ### Added

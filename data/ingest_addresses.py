@@ -1,4 +1,4 @@
-"""Ingest OpenAddresses-style source files into the packaged dataset.
+"""Ingest OpenAddresses-style source files into the working JSON dataset.
 
 This script is intentionally dependency-free so it can run in a fresh checkout.
 It supports OpenAddresses CSV exports, GeoJSON FeatureCollections, and newline-
@@ -10,13 +10,16 @@ import csv
 import gzip
 import json
 import random
+import sqlite3
 from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_DATASET = ROOT / "random_address" / "addresses-us-all.min.json.gz"
+DEFAULT_DATASET = ROOT / "data" / "work" / "addresses-us-all.min.json.gz"
+PACKAGE_DATASET = ROOT / "random_address" / "addresses-us-all.sqlite"
+SCALE = 10_000_000
 VALID_STATES = {
     "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL",
     "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME",
@@ -31,6 +34,10 @@ Address = Dict[str, Any]
 
 
 def load_dataset(path: Path) -> Dict[str, Any]:
+    if not path.exists():
+        if path.resolve() == DEFAULT_DATASET.resolve() and PACKAGE_DATASET.exists():
+            return load_sqlite_dataset(PACKAGE_DATASET)
+        return {"addresses": [], "attribution": []}
     opener = gzip.open if path.suffix == ".gz" else open
     with opener(path, "rt", encoding="utf-8") as source_file:
         data = json.load(source_file)
@@ -48,6 +55,116 @@ def write_dataset(path: Path, data: Dict[str, Any], pretty: bool = False) -> Non
             target_file.write("\n")
         else:
             json.dump(data, target_file, separators=(",", ":"))
+
+
+def load_sqlite_dataset(path: Path) -> Dict[str, Any]:
+    connection = sqlite3.connect(path)
+    connection.row_factory = sqlite3.Row
+    try:
+        data: Dict[str, Any] = {
+            "addresses": sqlite_addresses(connection),
+            "attribution": sqlite_attribution(connection),
+        }
+        clusters = sqlite_clusters(connection)
+        if clusters:
+            data["clusters"] = clusters
+        return data
+    finally:
+        connection.close()
+
+
+def sqlite_addresses(connection: sqlite3.Connection) -> List[Address]:
+    rows = connection.execute(
+        """
+        SELECT
+            a.address1,
+            a.address2,
+            c.name AS city,
+            s.code AS state,
+            p.code AS postalCode,
+            a.lat_e7,
+            a.lng_e7
+        FROM addresses a
+        JOIN cities c ON c.id = a.city_id
+        JOIN states s ON s.id = a.state_id
+        JOIN postal_codes p ON p.id = a.postal_code_id
+        ORDER BY a.id
+        """
+    )
+    return [
+        {
+            "address1": row["address1"],
+            "address2": row["address2"],
+            "city": row["city"],
+            "state": row["state"],
+            "postalCode": row["postalCode"],
+            "coordinates": {
+                "lat": row["lat_e7"] / SCALE,
+                "lng": row["lng_e7"] / SCALE,
+            },
+        }
+        for row in rows
+    ]
+
+
+def sqlite_attribution(connection: sqlite3.Connection) -> List[str]:
+    return [
+        row["value"]
+        for row in connection.execute("SELECT value FROM attribution ORDER BY value")
+    ]
+
+
+def sqlite_clusters(connection: sqlite3.Connection) -> List[Dict[str, Any]]:
+    rows = connection.execute(
+        """
+        SELECT
+            cl.id,
+            cl.cluster_key,
+            s.code AS state,
+            p.code AS postalCode,
+            cl.center_lat_e7,
+            cl.center_lng_e7,
+            cl.radius_m,
+            cl.count
+        FROM clusters cl
+        JOIN states s ON s.id = cl.state_id
+        JOIN postal_codes p ON p.id = cl.postal_code_id
+        ORDER BY cl.id
+        """
+    ).fetchall()
+    return [
+        {
+            "id": row["cluster_key"],
+            "state": row["state"],
+            "postalCode": row["postalCode"],
+            "center": {
+                "lat": row["center_lat_e7"] / SCALE,
+                "lng": row["center_lng_e7"] / SCALE,
+            },
+            "radius_km": row["radius_m"] / 1000,
+            "count": row["count"],
+            "address_indexes": sqlite_cluster_address_indexes(connection, row["id"]),
+        }
+        for row in rows
+    ]
+
+
+def sqlite_cluster_address_indexes(
+    connection: sqlite3.Connection,
+    cluster_id: int,
+) -> List[int]:
+    return [
+        row["address_id"]
+        for row in connection.execute(
+            """
+            SELECT address_id
+            FROM cluster_addresses
+            WHERE cluster_id = ?
+            ORDER BY position
+            """,
+            (cluster_id,),
+        )
+    ]
 
 
 def detect_format(path: Path, requested_format: str) -> str:
@@ -328,7 +445,7 @@ def summarize(addresses: Iterable[Address]) -> Dict[str, Any]:
 
 def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Merge OpenAddresses-style source data into the packaged address dataset."
+        description="Merge OpenAddresses-style source data into the working JSON address dataset."
     )
     parser.add_argument(
         "--input",
@@ -382,7 +499,7 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser.add_argument(
         "--pretty",
         action="store_true",
-        help="Write formatted JSON instead of the package's minified JSON.",
+        help="Write formatted JSON instead of minified JSON.",
     )
     parser.add_argument(
         "--dry-run",

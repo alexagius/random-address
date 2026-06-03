@@ -1,4 +1,4 @@
-"""Regenerate build-time cluster metadata for addresses-us-all.min.json.gz."""
+"""Regenerate build-time cluster metadata for the working JSON dataset."""
 
 import argparse
 import json

@@ -311,7 +311,7 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser.add_argument(
         "--pretty",
         action="store_true",
-        help="Write formatted JSON instead of the package's minified JSON.",
+        help="Write formatted JSON instead of minified JSON.",
     )
     parser.add_argument(
         "--dry-run",

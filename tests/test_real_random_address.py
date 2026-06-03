@@ -173,44 +173,10 @@ def test_real_random_address_cluster_rejects_invalid_options():
         real_random_address_cluster(count=1, max_radius_km=-1)
 
 
-def test_real_random_address_cluster_uses_precomputed_metadata(monkeypatch):
-    """Test clustered sampling prefers build-time cluster metadata when available."""
-    addresses = [
-        {
-            "address1": f"{index} Main Street",
-            "address2": "",
-            "city": "Albany",
-            "state": "NY",
-            "postalCode": "12207",
-            "coordinates": {"lat": 42.0 + (index * 0.0001), "lng": -73.0},
-        }
-        for index in range(6)
-    ]
-    data = {
-        "addresses": addresses,
-        "clusters": [
-            {
-                "id": "NY-12207-00001",
-                "state": "NY",
-                "postalCode": "12207",
-                "address_indexes": [5, 4, 3, 2, 1, 0],
-            }
-        ],
-    }
-    random_address_module._get_indexes.cache_clear()
-    monkeypatch.setattr(random_address_module, "_get_address_dict_list", lambda: data)
+def test_real_random_address_cluster_has_packaged_cluster_metadata():
+    """Test clustered sampling has packaged SQLite cluster rows to sample from."""
+    clusters = random_address_module._cluster_candidates(postal_code="06040")
 
-    try:
-        cluster = random_address_module.real_random_address_cluster(
-            count=3,
-            postal_code="12207",
-            seed=123,
-        )
-    finally:
-        random_address_module._get_indexes.cache_clear()
-
-    assert [address["address1"] for address in cluster] == [
-        "5 Main Street",
-        "4 Main Street",
-        "3 Main Street",
-    ]
+    assert clusters
+    assert all(cluster["count"] == 35 for cluster in clusters)
+    assert random_address_module._cluster_address_ids(clusters[0]["id"], city_ids=())

@@ -1,4 +1,4 @@
-"""Build compact ZIP-level address clusters for the packaged dataset."""
+"""Build compact ZIP-level address clusters for the working JSON dataset."""
 
 import math
 from collections import defaultdict

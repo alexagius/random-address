@@ -1,6 +1,6 @@
 # Dataset Coverage
 
-Counts are generated from `random_address/addresses-us-all.min.json.gz` on this branch.
+Counts are generated from `random_address/addresses-us-all.sqlite` on this branch.
 Records are kept only when they include `address1`, `city`, `state`, a 5-digit `postalCode`, and coordinates.
 
 - Total addresses: 1,031,008
