@@ -9,7 +9,7 @@ with open("README.md", 'r') as fh:
 
 setup(
     name='random-address-extended',
-    version='1.3.1',
+    version='1.3.2',
     description='Extended fork of random-address with broader coverage and batch sampling',
     packages=['random_address'],
     package_data={'random_address': ['addresses-us-all.sqlite']},

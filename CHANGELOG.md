@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.3.2] - 2026-06-04
 ### Added
 - Expanded the packaged dataset to 1,031,008 complete geocoded records with an Overture clustered 35-per-ZIP refresh.
 - Added precomputed ZIP cluster metadata for 23,340 compact latitude/longitude groups.
